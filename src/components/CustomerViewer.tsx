@@ -11,13 +11,15 @@ import {
   MessageCircle,
   Lock,
   Layers,
-  Sparkles
+  Sparkles,
+  Settings
 } from 'lucide-react';
 
 interface CustomerViewerProps {
   pages: MenuPage[];
   config: RestaurantConfig;
   onOpenAdmin: () => void;
+  onSwitchToAdmin?: () => void;
   isAdminUnlocked?: boolean;
 }
 
@@ -25,6 +27,7 @@ export function CustomerViewer({
   pages,
   config,
   onOpenAdmin,
+  onSwitchToAdmin,
 }: CustomerViewerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -188,10 +191,10 @@ export function CustomerViewer({
           กรุณาเข้าสู่ระบบจัดการเพื่อเพิ่มรูปภาพใบเมนูของทางร้าน
         </p>
         <button
-          onClick={onOpenAdmin}
+          onClick={onSwitchToAdmin || onOpenAdmin}
           className="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold rounded-xl text-sm transition-colors cursor-pointer"
         >
-          เปิดระบบจัดการ (สำหรับเจ้าของร้าน)
+          ⚙️ เปิดระบบจัดการ (สำหรับเจ้าของร้าน)
         </button>
       </div>
     );
@@ -202,7 +205,7 @@ export function CustomerViewer({
       ref={containerRef}
       className="relative flex flex-col h-screen w-screen bg-neutral-950 text-neutral-100 select-none overflow-hidden touch-none"
     >
-      {/* Top Customer Header Bar (Minimal, clean, restaurant branding only) */}
+      {/* Top Customer Header Bar */}
       <header className="relative z-20 flex items-center justify-between px-3 py-2.5 bg-neutral-950/90 backdrop-blur-md border-b border-neutral-800/80">
         <div className="flex items-center gap-2.5 min-w-0">
           {config.logoUrl ? (
@@ -212,7 +215,6 @@ export function CustomerViewer({
                 alt={config.restaurantName || 'โลโก้ร้าน'}
                 className="w-full h-full object-cover"
                 onError={(e) => {
-                  // Fallback if logo fails to load
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
@@ -232,22 +234,22 @@ export function CustomerViewer({
           </div>
         </div>
 
-        {/* Header Right: Page Counter & Hidden Admin Unlock Button */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Header Right: Page Counter & Prominent Admin Switcher Button with Gear ⚙️ */}
+        <div className="flex items-center gap-2 shrink-0">
           {pages.length > 1 && (
             <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-neutral-800/80 text-neutral-300 border border-neutral-700/50">
               {currentIndex + 1} / {pages.length}
             </span>
           )}
 
-          {/* Discreet Admin Lock Button for Shop Owner (Discreet so normal customers won't notice) */}
+          {/* Prominent Admin / Settings Button */}
           <button
-            onClick={onOpenAdmin}
-            title="สำหรับเจ้าของร้าน (Admin Login)"
-            className="p-1.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/60 rounded-lg transition-colors cursor-pointer"
-            aria-label="Admin Settings"
+            onClick={onSwitchToAdmin || onOpenAdmin}
+            title="เข้าสู่ระบบจัดการร้าน / แก้ไขชื่อและโลโก้ / เพิ่มรูปเมนู"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 active:scale-95 text-neutral-950 font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
           >
-            <Lock className="w-3.5 h-3.5" />
+            <Settings className="w-3.5 h-3.5" />
+            <span>⚙️ โหมดเจ้าของร้าน</span>
           </button>
         </div>
       </header>

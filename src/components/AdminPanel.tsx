@@ -17,7 +17,8 @@ import {
   KeyRound,
   Check,
   X,
-  AlertCircle
+  AlertCircle,
+  Settings
 } from 'lucide-react';
 
 interface AdminPanelProps {
@@ -310,6 +311,36 @@ export function AdminPanel({
           {/* Action buttons */}
           <div className="flex items-center gap-2">
             <button
+              onClick={() => {
+                setTempConfig(config);
+                setIsConfigModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold rounded-xl text-xs transition-all cursor-pointer shadow-sm active:scale-95"
+              title="แก้ไขชื่อร้านและเปลี่ยนรูปโลโก้"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>⚙️ แก้ไขชื่อร้าน & โลโก้</span>
+            </button>
+
+            <button
+              onClick={openAddModal}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition-all cursor-pointer shadow-sm active:scale-95"
+              title="เพิ่มรูปภาพใบเมนูใหม่"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>➕ เพิ่มรูปเมนู</span>
+            </button>
+
+            <button
+              onClick={onOpenCustomerView}
+              className="inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold rounded-xl text-xs transition-colors cursor-pointer border border-neutral-700"
+              title="เปิดดูในมุมมองของลูกค้า (LINE)"
+            >
+              <Eye className="w-3.5 h-3.5 text-amber-400" />
+              <span>ดูมุมมองลูกค้า</span>
+            </button>
+
+            <button
               onClick={onOpenLineShare}
               className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#06C755] hover:bg-[#05b34c] text-white font-semibold rounded-xl text-xs transition-colors cursor-pointer shadow-sm"
               title="ส่งลิงก์ให้ลูกค้าทาง LINE"
@@ -317,39 +348,100 @@ export function AdminPanel({
               <Share2 className="w-3.5 h-3.5" />
               <span>ส่งทาง LINE</span>
             </button>
-
-            <button
-              onClick={onOpenCustomerView}
-              className="inline-flex items-center gap-1.5 px-3 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold rounded-xl text-xs transition-colors cursor-pointer border border-neutral-700"
-              title="เปิดดูในมุมมองของลูกค้า"
-            >
-              <Eye className="w-3.5 h-3.5 text-amber-400" />
-              <span>ดูมุมมองลูกค้า</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setTempConfig(config);
-                setIsConfigModalOpen(true);
-              }}
-              className="p-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-xl transition-colors cursor-pointer border border-neutral-700"
-              title="ตั้งค่าร้านและรหัส PIN"
-              aria-label="ตั้งค่าร้าน"
-            >
-              <KeyRound className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </header>
 
       {/* Main Content Container */}
       <main className="max-w-5xl mx-auto px-4 pt-6">
-        {/* Quick Highlights / Banner */}
-        <div className="mb-6 p-4 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        {/* Prominent Restaurant Profile & Quick Actions Hero Card */}
+        <div className="mb-6 p-5 rounded-3xl bg-neutral-900/80 border border-neutral-800 shadow-xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              {/* Logo Avatar (Clickable to edit) */}
+              <div
+                onClick={() => {
+                  setTempConfig(config);
+                  setIsConfigModalOpen(true);
+                }}
+                className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-neutral-800 border-2 border-amber-500/40 overflow-hidden shrink-0 shadow-lg cursor-pointer group"
+                title="คลิกเพื่อเปลี่ยนรูปโลโก้"
+              >
+                {config.logoUrl ? (
+                  <img
+                    src={config.logoUrl}
+                    alt={config.restaurantName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-amber-500/10 text-amber-400 text-2xl font-bold">
+                    {config.restaurantName ? config.restaurantName.charAt(0) : 'R'}
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-[10px] text-amber-300 transition-opacity font-medium">
+                  <Edit2 className="w-4 h-4 mb-0.5" />
+                  <span>เปลี่ยน</span>
+                </div>
+              </div>
+
+              {/* Restaurant Details */}
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg sm:text-xl font-bold text-neutral-100">
+                    {config.restaurantName || 'ชื่อร้านของคุณ'}
+                  </h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold">
+                    ร้านของคุณ
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  {config.tagline || 'อาหารอร่อย สดใหม่ บริการประทับใจ'}
+                </p>
+                <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-neutral-400">
+                  {config.lineId && (
+                    <span className="text-[#06C755] font-medium flex items-center gap-1">
+                      LINE: {config.lineId}
+                    </span>
+                  )}
+                  {config.phone && (
+                    <span className="text-neutral-400">
+                      โทร: {config.phone}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action Buttons for Owner */}
+            <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+              <button
+                onClick={() => {
+                  setTempConfig(config);
+                  setIsConfigModalOpen(true);
+                }}
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-bold rounded-2xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Settings className="w-4 h-4" />
+                <span>⚙️ แก้ไขชื่อร้าน & โลโก้</span>
+              </button>
+
+              <button
+                onClick={openAddModal}
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-2xl text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>➕ เพิ่มรูปใบเมนู</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Menu Section Header */}
+        <div className="mb-4 p-4 rounded-2xl bg-neutral-900/60 border border-neutral-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-neutral-200">
-              จัดการรูปภาพใบเมนู ({pages.length} หน้า)
-            </h2>
+            <h3 className="text-sm font-bold text-neutral-200 flex items-center gap-2">
+              <span>📋 รายการใบเมนูอาหารของร้าน ({pages.length} หน้า)</span>
+            </h3>
             <p className="text-xs text-neutral-400 mt-0.5">
               สามารถกดเม้าส์ค้างไว้ที่ใบเมนูแล้วลากวางเพื่อเปลี่ยนลำดับได้ทันที
             </p>

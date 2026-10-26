@@ -42,17 +42,20 @@ export default function App() {
     return DEFAULT_RESTAURANT_CONFIG;
   });
 
-  // Mode state: 'customer' (for clients via LINE) or 'admin' (for shop owner)
+  // Mode state: 'admin' by default so the owner can immediately edit name, logo, and menu.
+  // When customers open the shared LINE link with ?view=customer or ?view=menu, they see the clean viewer.
   const [currentMode, setCurrentMode] = useState<'customer' | 'admin'>(() => {
-    // Check URL query param or hash on initial load
     if (typeof window !== 'undefined') {
       const searchParams = new URLSearchParams(window.location.search);
       const hash = window.location.hash;
+      if (searchParams.get('view') === 'customer' || searchParams.get('view') === 'menu' || hash === '#/menu') {
+        return 'customer';
+      }
       if (searchParams.get('admin') === 'true' || searchParams.get('mode') === 'admin' || hash === '#/admin') {
         return 'admin';
       }
     }
-    return 'customer';
+    return 'admin';
   });
 
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
@@ -94,17 +97,12 @@ export default function App() {
     return () => window.removeEventListener('popstate', handleUrlChange);
   }, []);
 
-  // When owner clicks discreet lock button in Customer View
+  // When owner clicks gear/admin button in Customer View
   const handleOpenAdmin = () => {
-    if (isAdminUnlocked) {
-      setCurrentMode('admin');
-    } else {
-      setIsPinModalOpen(true);
-    }
+    setCurrentMode('admin');
   };
 
   const handlePinSuccess = () => {
-    setIsAdminUnlocked(true);
     setIsPinModalOpen(false);
     setCurrentMode('admin');
   };
@@ -128,7 +126,7 @@ export default function App() {
           pages={pages}
           config={config}
           onOpenAdmin={handleOpenAdmin}
-          isAdminUnlocked={isAdminUnlocked}
+          onSwitchToAdmin={() => setCurrentMode('admin')}
         />
       ) : (
         <AdminPanel
